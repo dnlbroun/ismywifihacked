@@ -181,7 +181,7 @@ def create_app(
                 "We can't see your router",
                 "Your provider shares one internet address among many customers (carrier-grade "
                 "NAT), so your router isn't reachable from the internet and we can't test it. "
-                "That's generally good for security, but it isn't a pass.",
+                "That's good for security, but it means we couldn't test anything.",
             )
         return error(
             400,

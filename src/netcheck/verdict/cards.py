@@ -152,7 +152,7 @@ def exposure_card(o: ExposureOutcome, content: IspContent, isp_slug: str) -> Car
             Status.UNKNOWN,
             "Something answers on almost every port, so we can't tell what's really exposed.",
             facts=[f"{len(open_ports)} of {len(r.ports)} ports accepted a connection."],
-            note="Usually a firewall or proxy in front of your connection, common on work, school and hotel networks.",
+            note="This is usually a firewall or proxy, which is common on work, school and hotel networks.",
         )
 
     if not open_ports and not ssdp and not natpmp and not open_resolver and not dns_port:
@@ -212,13 +212,13 @@ def exposure_card(o: ExposureOutcome, content: IspContent, isp_slug: str) -> Car
         )
     elif dns_port:
         facts.append(
-            "Something answers DNS on port 53 but refused our lookup. Not dangerous, but it doesn't need to be public."
+            "Something answers DNS on port 53 but refused our lookup. That isn't dangerous, but it doesn't need to be public."
         )
 
     n = len(open_ports) + int(ssdp) + int(natpmp) + int(open_resolver) + int(dns_port)
     headline = (
         f"{n} thing{'s' if n != 1 else ''} on your network can be reached from the internet"
-        + (" - some of them are risky." if worst is Status.BAD else ".")
+        + (", and some are risky." if worst is Status.BAD else ".")
     )
     note = None if r.complete else "The scan ran out of time, so there may be more."
     return Card(
@@ -243,7 +243,7 @@ def _cant_see(key: str, title: str, fam: str, *, carrier: bool, probes: int | No
             facts=[
                 "Your provider shares addresses between customers (carrier-grade NAT), so nobody on the internet can reach your router."
             ],
-            note="That protects you from what this check looks for, but we couldn't test the router itself.",
+            note="That protects your router from the internet, but it also means we couldn't test it.",
             label="Hidden",
         )
     tried = f"{probes} common entry points" if probes else "common entry points"
@@ -254,9 +254,9 @@ def _cant_see(key: str, title: str, fam: str, *, carrier: bool, probes: int | No
         f"Nothing on your network answered us from the internet ({fam}).",
         facts=[
             f'We tried {tried} and got no reply at all, not even a "closed".',
-            "That's how a well-protected home network usually looks: the router ignores strangers.",
+            "A well-protected home network usually looks like this from outside.",
         ],
-        note="It isn't a guarantee: carrier-grade NAT looks the same, though that also keeps your router out of reach.",
+        note="This isn't a guarantee: carrier-grade NAT looks the same from outside.",
         label="Nothing visible",
     )
 

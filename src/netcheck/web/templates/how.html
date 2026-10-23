@@ -3,15 +3,15 @@
 {% block main %}
 <section class="hero">
   <h1>How it works</h1>
-  <p class="lede">We look at your connection from the internet, the way a stranger would.</p>
+  <p class="lede">What we check, where the information comes from, and what we can't see.</p>
 </section>
 
 <section class="guide">
   <h2>The checks</h2>
   <dl class="checks-dl">
-    <dt>Open doors</dt>
+    <dt>Exposed devices</dt>
     <dd>We try about 30 entry points (router admin pages, remote desktop, file sharing, cameras, printers, Android TV boxes)
-        and ask whether your router answers UPnP, NAT-PMP or DNS requests from outside. We only see what answers; we never log in.
+        and ask whether your router answers UPnP, NAT-PMP or DNS requests from outside. We only note what answers and never log in.
         If you have both an IPv4 and an IPv6 address, we check both.</dd>
     <dt>DNS hijacking</dt>
     <dd>Your browser looks up a one-time name on our DNS server, which shows us which DNS service answered for you.</dd>
@@ -23,7 +23,7 @@
 
   <h2>Help for your provider</h2>
   <p>We recognise your internet provider from your address. For {% for name in supported_isps %}{{ name }}{% if loop.revindex == 2 %} and {% elif not loop.last %}, {% endif %}{% endfor %},
-     the fix steps and the <a href="/wifi">Wi-Fi guide</a> include the exact menus for your provider's router or app, taken from their own documentation.
+     the fix steps and the <a href="/wifi">Wi-Fi guide</a> include the menus for your provider's router or app, based on their support pages where we could find them.
      Everyone else gets general steps.</p>
 
   <h2>The colours</h2>

@@ -3,8 +3,8 @@
 {% block main %}
 <section class="hero">
   <h1>Is my Wi-Fi hacked?</h1>
-  <p class="lede">We check your connection from the outside, the way an attacker would: for open doors into your network,
-     hijacked DNS, and signs of an infected device. It takes about 15 seconds.</p>
+  <p class="lede">A free check of your home internet connection for exposed devices, DNS hijacking
+     and signs of infection. It takes about 15 seconds.</p>
 
   <form id="scan-form" method="post" action="/scan"
         data-dns-zone="{{ dns_zone }}" data-v4-host="{{ v4_host }}" data-v6-host="{{ v6_host }}">
@@ -23,11 +23,11 @@
 <section class="explain">
   <h2>What we check</h2>
   <ul class="checks">
-    <li><strong>Open doors.</strong> About 30 entry points attackers try: router admin pages, cameras, file sharing, remote desktop, UPnP.</li>
-    <li><strong>DNS hijacking.</strong> Whether your lookups go somewhere unexpected.</li>
+    <li><strong>Exposed devices.</strong> Whether your router, cameras, file shares or other devices can be reached from the internet. We try about 30 common ports.</li>
+    <li><strong>DNS hijacking.</strong> Whether your web lookups go through a server you didn't choose.</li>
     <li><strong>Botnet activity.</strong> Whether your address has been seen or reported attacking other computers.</li>
   </ul>
-  <p>We never try passwords. We only see what answers.
-     For what a website can't see, like who's on your Wi-Fi, use the <a href="/wifi">Wi-Fi guide</a>.</p>
+  <p>We never try passwords or log in to anything.
+     To check things a website can't see, like who's on your Wi-Fi, use the <a href="/wifi">Wi-Fi guide</a>.</p>
 </section>
 {% endblock %}

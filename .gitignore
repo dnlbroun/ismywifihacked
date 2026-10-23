@@ -5,7 +5,7 @@ __pycache__/
 .ruff_cache/
 .pytest_cache/
 # runtime data and secrets never go in git
-data/
+/data/
 *.db
 *.db-journal
 .env

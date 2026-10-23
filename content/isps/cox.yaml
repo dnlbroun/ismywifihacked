@@ -1,0 +1,15 @@
+name: Cox
+asns: [22773]  # ip2asn: "ASN-CXA-ALL-CCI-22773-RDC" (Cox Communications Inc.)
+
+# Cox's own support articles didn't load; these come from Cox community forum
+# moderators (2024 and 2026 posts agree). The app path matches Xfinity's, whose
+# platform Panoramic Wifi uses. Some accounts see the Port Forwarding page greyed
+# out; only the primary Cox user ID can change it.
+howto:
+  login: Cox Panoramic Wifi gateways are managed in the Cox Panoramic Wifi app.
+  port_forwarding: "Panoramic Wifi app > WiFi > View WiFi equipment > Advanced Settings > Port Forwarding. Delete any rule you don't recognise."
+sources:
+  - https://forums.cox.com/conversations/internet/port-forwarding/68751787f7d738f1980142c5
+  - https://forums.cox.com/conversations/apps/unable-to-set-up-port-forwarding-using-my-cox-app/6963cce6b9ef6c7bf87a1508
+
+steps: {}

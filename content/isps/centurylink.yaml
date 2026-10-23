@@ -1,0 +1,24 @@
+name: CenturyLink / Quantum Fiber
+asns: [209]  # ip2asn: "CENTURYLINK-US-LEGACY-QWEST"
+
+# From CenturyLink's modem help pages, which say menus vary slightly by model.
+# These are for CenturyLink modems; Quantum Fiber's own routers weren't covered
+# by any official page found, so their menus may differ.
+howto:
+  login: Connect to your home network, open http://192.168.0.1 and sign in with the Admin Username and Admin Password on the modem's sticker.
+  remote_management: "Advanced Setup > Remote Management: make sure Remote GUI, Remote Console and Remote Telnet are not enabled, then click Apply."
+  upnp: "Advanced Setup > Security > UPnP: disable UPnP, then click Apply."
+  port_forwarding: "Advanced Setup > Security > Port Forwarding: remove any entry in the Port Forwarding List you don't recognise, then click Apply."
+  dmz: "Advanced Setup > Security > DMZ Hosting: make sure DMZ is disabled, then click Apply."
+  devices: Status > Device Table lists the devices connected to your network.
+  wifi_security: "Wireless Setup > Wireless Security: set the security type to WPA2, then click Apply."
+  wps: "Wireless Setup > WPS: disable WPS (on both 2.4 GHz and 5 GHz if your modem has both), then click Apply."
+  firmware: Utilities > Update Firmware checks for and installs the latest firmware.
+sources:
+  - https://www.centurylink.com/home/help/internet/modems-and-routers/modem-settings-overview.html
+  - https://www.centurylink.com/home/help/internet/modems-and-routers/advanced-setup/security-settings.html
+  - https://www.centurylink.com/home/help/internet/modems-and-routers/advanced-setup/remote-management.html
+  - https://www.centurylink.com/home/help/internet/modems-and-routers/wireless-setup.html
+  - https://www.centurylink.com/home/help/internet/modems-and-routers/utilities.html
+
+steps: {}

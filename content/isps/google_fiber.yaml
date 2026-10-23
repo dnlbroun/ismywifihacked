@@ -1,0 +1,18 @@
+name: Google Fiber
+asns: [16591]  # ip2asn: "GOOGLE-FIBER"
+
+# From GFiber's support pages, for GFiber's own routers. Google Wifi and Nest
+# Wifi Pro routers are managed in the Google Home app instead.
+howto:
+  login: GFiber routers are managed in the gFiber app, or by signing in to your gFiber account on the web.
+  upnp: "gFiber app > Network > Network settings > Advanced network settings > Ports: turn Universal plug and play off, then tap Save."
+  port_forwarding: "gFiber app > Network > Network settings > Advanced network settings > Ports. Tap any rule you don't recognise and choose Remove rule."
+  dmz: "Sign in to your gFiber account on the web, select Network, and make sure DMZ is switched off for every device."
+  dns: "gFiber app > Network > Network settings > Advanced network settings > DNS: make sure it isn't set to servers you don't recognise."
+sources:
+  - https://gfiber.com/support/en/answer/1980/
+  - https://gfiber.com/support/en/answer/1905/
+  - https://gfiber.com/support/en/answer/1862/
+  - https://gfiber.com/support/en/answer/1907/
+
+steps: {}

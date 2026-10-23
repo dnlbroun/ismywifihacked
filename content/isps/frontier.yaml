@@ -1,0 +1,19 @@
+name: Frontier
+asns: [5650, 7011, 3593]  # ip2asn: "FRONTIER-FRTR", "FRONTIER-AND-CITIZENS", "FRONTIER-EPIX"
+
+# Frontier uses many router models. Frontier Fiber plans now come with eero
+# routers (Frontier's help center), so the menu lines are eero's, from eero's own
+# support pages. Older Frontier routers have their own menus, so those lines say
+# "On an eero:".
+howto:
+  login: Frontier Fiber comes with an eero router, which you manage in the eero app (there's a button for it in the MyFrontier app).
+  upnp: "On an eero: eero app > Settings > Advanced networking > UPnP: turn the toggle off."
+  port_forwarding: "On an eero: eero app > Settings > Advanced networking > Reservations & port forwarding. Tap any rule you don't recognise and choose Delete port forward."
+  wifi_security: In your router's Wi-Fi settings, choose WPA2 (or WPA/WPA2) security with AES encryption.
+sources:
+  - https://frontier.com/helpcenter/internet/how-to-use-your-frontier-router
+  - https://frontier.com/helpcenter/internet/change-wifi-network-name-and-password
+  - https://eero.com/support/articles/how-do-i-set-up-port-forwarding
+  - https://eero.com/support/articles/how-do-i-fix-xbox-nat-issues-with-eero
+
+steps: {}

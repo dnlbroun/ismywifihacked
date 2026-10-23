@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
-  <title>{% block title %}Is My Wi-Fi Hacked? Free network checkup{% endblock %}</title>
+  <title>{% block title %}Is My Wi-Fi Hacked?{% endblock %}</title>
   <link rel="stylesheet" href="/static/style.css">
   {% block head %}{% endblock %}
 </head>
@@ -21,11 +21,8 @@
     {% block main %}{% endblock %}
   </main>
   <footer class="site">
-    <section class="privacy" id="privacy">
-      <p>We only scan the address you're connecting from, only when you click the button, and we don't keep your IP address.
-         Results are deleted after 24 hours. No ads, analytics or trackers. <a href="/how-it-works#privacy">More about privacy</a>.</p>
-      <p>This site is open source: <a href="https://github.com/dnlbroun/ismywifihacked">read the code on GitHub</a>.</p>
-    </section>
+    <p>We don't keep your IP address, results are deleted after 24 hours, and there are no trackers.
+       <a href="/how-it-works#privacy">Privacy</a> · <a href="https://github.com/dnlbroun/ismywifihacked">Source code</a></p>
   </footer>
 </body>
 </html>

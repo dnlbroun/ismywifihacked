@@ -48,6 +48,7 @@ class Report:
     isp_name: str
     network_name: str | None
     cards: list[Card]
+    isp_specific: bool = False  # router how-tos available for this provider
 
     @property
     def overall(self) -> Status:

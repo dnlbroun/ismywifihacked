@@ -27,7 +27,7 @@ from netcheck.reputation.internetdb import InternetDbClient
 from netcheck.results import ResultStore
 from netcheck.scan.runner import ScanPlan, scan_exposure
 from netcheck.verdict.cards import CANT_CHECK
-from netcheck.verdict.content import IspContent
+from netcheck.verdict.content import Isp, IspContent
 from netcheck.web.ratelimit import ClaimStore, ScanRateLimiter
 from netcheck.web.security import (
     CSRF_COOKIE,
@@ -130,6 +130,7 @@ def create_app(
             slots=asyncio.Semaphore(settings.max_concurrent_scans),
             templates=make_templates(),
         )
+        holder["s"].templates.globals["supported_isps"] = d.content.supported_names()
         lookups = ["GreyNoise", "Shodan"] + (["AbuseIPDB"] if d.abuse is not None else [])
         holder["s"].templates.globals["lookup_services"] = (
             ", ".join(lookups[:-1]) + " and " + lookups[-1]
@@ -152,6 +153,17 @@ def create_app(
     def render(name: str, status: int = 200, **ctx: Any) -> HTMLResponse:
         html = state().templates.get_template(name).render(domain=settings.domain, **ctx)
         return HTMLResponse(html, status_code=status, headers={"Cache-Control": "no-store"})
+
+    def visitor_isp(request: Request) -> Isp | None:
+        """The visitor's ISP, if we have router how-tos for it. The address is looked
+        up in memory only, never stored or logged."""
+        try:
+            ip = client_ip(request)
+        except ClientIpError:
+            return None
+        deps = state().deps
+        isp = deps.content.isp(deps.classes.isp_slug(deps.asn_db.lookup(ip)))
+        return isp if isp.howto else None
 
     def error(status: int, title: str, message: str) -> HTMLResponse:
         return render("error.html", status, title=title, message=message)
@@ -176,6 +188,7 @@ def create_app(
         token = request.cookies.get(CSRF_COOKIE) or new_csrf_token()
         resp = render(
             "index.html",
+            isp=visitor_isp(request),
             csrf=token,
             dns_zone=settings.dns_zone,
             v4_host=f"v4.{settings.domain}",
@@ -186,16 +199,7 @@ def create_app(
 
     @app.api_route("/wifi", methods=["GET", "HEAD"], response_class=HTMLResponse)
     async def wifi_guide(request: Request) -> HTMLResponse:
-        # Detect the visitor's ISP to show its router instructions. The address is
-        # looked up in memory and never stored or logged.
-        isp = None
-        try:
-            ip = client_ip(request)
-            slug = state().deps.classes.isp_slug(state().deps.asn_db.lookup(ip))
-            isp = state().deps.content.isp(slug) if slug != "generic" else None
-        except ClientIpError:
-            pass
-        return render("wifi.html", isp=isp)
+        return render("wifi.html", isp=visitor_isp(request))
 
     @app.api_route("/how-it-works", methods=["GET", "HEAD"], response_class=HTMLResponse)
     async def how_it_works() -> HTMLResponse:

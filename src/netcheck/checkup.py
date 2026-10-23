@@ -119,7 +119,8 @@ async def run_checkup(
     # For a recognised ISP show its friendly name plus the network name; otherwise the
     # network name from the ASN database is the best label we have.
     network_name = primary_asn.name if primary_asn else None
-    isp_name = deps.content.isp(isp_slug).name
+    isp = deps.content.isp(isp_slug)
+    isp_name = isp.name
     if isp_slug == "generic" and network_name:
         isp_name, network_name = network_name, None
     return Report(
@@ -129,6 +130,7 @@ async def run_checkup(
         isp_name=isp_name,
         network_name=network_name,
         cards=cards,
+        isp_specific=bool(isp.howto),
     )
 
 

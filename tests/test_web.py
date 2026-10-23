@@ -301,6 +301,7 @@ def test_isp_specific_help(h: Harness) -> None:
     h.scan.results[COMCAST_V4] = exposure(80, ssdp=SsdpResult(responded=True))
     body = card(scan_page(h), "exposure_v4")[1]
     assert "On your Xfinity (Comcast) router:" in body
+    assert "Router-specific help included" in scan_page(h, "24.0.1.20")
     assert "Device Discovery" in body
 
     h.scan.results["8.8.4.4"] = exposure(80)  # not a known ISP
@@ -344,7 +345,12 @@ def test_pages(h: Harness) -> None:
         assert (
             "You seem to be on" not in c.get("/wifi", headers={"X-Forwarded-For": "8.8.4.4"}).text
         )
+        assert (
+            "Your results will include steps for your Xfinity (Comcast) router"
+            in c.get("/", headers={"X-Forwarded-For": COMCAST_V4}).text
+        )
         how = c.get("/how-it-works").text
+        assert "Verizon Fios" in how
         assert 'id="privacy"' in how
         assert "GreyNoise and Shodan" in how
         assert c.head("/").status_code == 200

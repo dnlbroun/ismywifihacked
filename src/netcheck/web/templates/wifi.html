@@ -1,79 +1,68 @@
 {% extends "base.html" %}
-{% block title %}Is my Wi-Fi hacked? A 10-minute self-check{% endblock %}
+{% block title %}Wi-Fi guide · Is My Wi-Fi Hacked?{% endblock %}
 {% block main %}
 <section class="hero">
   <h1>Check your Wi-Fi yourself</h1>
-  <p class="lede">No website can see inside your Wi-Fi, but you can, in about 10 minutes, from your router's app or settings page.
-     Work through these in order; the first three matter most.</p>
+  <p class="lede">No website can see inside your Wi-Fi. You can, in about 10 minutes, from your router's app or settings page.
+     The first three steps matter most.</p>
 </section>
 
-{% if isp and isp.howto %}
 <section class="isp-help isp-box">
-  <p class="isp-help-title">You seem to be on {{ isp.name }}. Here's how to get into your router:</p>
+{% if isp and isp.howto %}
+  <p class="isp-help-title">You seem to be on {{ isp.name }}:</p>
   <ul>
     {% for key in ["login", "devices", "wifi_security"] %}{% if isp.howto.get(key) %}<li>{{ isp.howto[key] }}</li>{% endif %}{% endfor %}
   </ul>
-  <p class="muted small">Menu names can change between router models and app versions.</p>
-</section>
+  <p class="muted small">Menu names vary by router model.</p>
 {% else %}
-<section class="isp-help isp-box">
   <p class="isp-help-title">Getting into your router</p>
-  <ul>
-    <li>Most providers have an app (search your provider's name plus "app") that shows your Wi-Fi settings and connected devices.</li>
-    <li>Otherwise, the router's settings page address and admin password are usually printed on a label on the router.</li>
-  </ul>
-</section>
+  <p>Use your internet provider's app, or the settings address and admin password printed on the router's label.</p>
 {% endif %}
+</section>
 
 <section class="guide">
-  <h2 id="devices">1. Who's on your Wi-Fi?</h2>
-  <p>Find the list of connected devices (often called "Connected devices", "Attached devices" or "Clients").
-     Count your own: phones, laptops, TVs, speakers, the doorbell, the thermostat. Names are often unhelpful, like "ESP_3A1F" or a string of numbers.</p>
-  <p><strong>If something doesn't add up,</strong> change your Wi-Fi password. Every device has to reconnect with the new one, so anything that shouldn't be there gets kicked off.
-     Reconnect your own devices one by one; anything you can't account for afterwards wasn't yours.</p>
+  <h2 id="devices">1. See who's connected</h2>
+  <p>Open the list of connected devices ("Connected devices", "Attached devices" or "Clients") and match each one to something you own.
+     Names are often unhelpful, like "ESP_3A1F".</p>
+  <p>If you can't account for something, change the Wi-Fi password. Every device has to reconnect, so anything that isn't yours drops off.</p>
 
-  <h2 id="security">2. Is your Wi-Fi properly encrypted?</h2>
-  <p>In your Wi-Fi settings, look for "Security", "Encryption" or "Authentication":</p>
-  <ul>
-    <li><strong>WPA3</strong> or <strong>WPA2</strong> (sometimes "WPA2-PSK" or "WPA2/WPA3"): good.</li>
-    <li><strong>WEP</strong>, <strong>WPA</strong> (without the 2), or <strong>Open / None</strong>: change it now. These can be broken or need no password at all.</li>
-  </ul>
+  <h2 id="security">2. Check the encryption</h2>
+  <p>Under "Security" or "Encryption", you want <strong>WPA2</strong> or <strong>WPA3</strong>.
+     <strong>WEP</strong>, plain <strong>WPA</strong> or <strong>Open</strong> are unsafe: change them now.</p>
 
   <h2 id="passwords">3. Change default passwords</h2>
-  <p>There are two passwords: the <strong>Wi-Fi password</strong> (to join the network) and the <strong>router admin password</strong> (to change its settings).
-     If either is still the one printed on the label, change it. Anyone who's seen the label (a visitor, a previous tenant, a repair person) knows it.</p>
-  <p>A good Wi-Fi password is long rather than complicated: four or five random words ("lamp-river-cobalt-tuesday") beats "P@ssw0rd!".</p>
+  <p>Change the Wi-Fi password and the router admin password if either is still the one on the label.
+     Long beats complicated: four random words ("lamp-river-cobalt-tuesday") is stronger than "P@ssw0rd!".</p>
 
-  <h2 id="features">4. Turn off features you don't use</h2>
+  <h2 id="features">4. Turn off what you don't use</h2>
   <ul>
-    <li><strong>WPS</strong> (the push-button/PIN pairing): it's easy to attack on many routers.</li>
-    <li><strong>Remote management</strong> ("Remote access", "Web access from WAN"): lets the router's settings page be reached from the internet.</li>
-    <li><strong>UPnP</strong>: lets devices open holes in your firewall by themselves. Turn it off unless a game console or app needs it.</li>
-    <li><strong>Port forwarding / DMZ</strong>: delete any rule you didn't set up on purpose.</li>
+    <li><strong>WPS</strong> (push-button or PIN pairing): easy to attack on many routers.</li>
+    <li><strong>Remote management</strong> ("Remote access", "Web access from WAN"): puts the settings page on the internet.</li>
+    <li><strong>UPnP</strong>: lets devices open your firewall on their own. Leave it on only if a console or app needs it.</li>
+    <li><strong>Port forwarding and DMZ</strong>: delete any rule you didn't set up.</li>
   </ul>
 
   <h2 id="updates">5. Keep the router updated</h2>
-  <p>Look for "Firmware", "Software update" or "Router update" and turn on automatic updates if it's offered. Routers from your internet provider usually update themselves.
-     If your own router hasn't had an update in years, it's time to replace it: old routers are a favourite target of botnets.</p>
+  <p>Turn on automatic firmware updates if offered. Provider routers usually update themselves.
+     If your own router hasn't had an update in years, replace it.</p>
 
-  <h2 id="guest">6. Put visitors and gadgets on a guest network</h2>
-  <p>Most routers can run a separate "guest" Wi-Fi. Use it for visitors and for smart-home gadgets (cameras, plugs, TVs), which are rarely updated.
-     If one of them is compromised, it can't reach your laptop or phone.</p>
+  <h2 id="guest">6. Use a guest network for gadgets</h2>
+  <p>Put visitors and smart devices (cameras, plugs, TVs) on the guest Wi-Fi. If one is compromised, it can't reach your computers.</p>
 
-  <h2 id="signs">Signs something may be wrong</h2>
+  <h2 id="signs">Signs something is wrong</h2>
   <ul>
-    <li>Your router's settings changed without you, or the admin password no longer works.</li>
-    <li>Websites redirect somewhere strange, or you see ads where there shouldn't be any.</li>
-    <li>Your internet is suddenly slow with nothing running, or your provider warns you about suspicious traffic.</li>
-    <li>Devices you don't recognise keep reappearing after a password change.</li>
+    <li>Router settings or the admin password changed without you.</li>
+    <li>Websites redirect somewhere strange or show unexpected ads.</li>
+    <li>Your provider warns you about suspicious traffic.</li>
+    <li>Unknown devices come back after a password change.</li>
   </ul>
 
-  <h2 id="fix">If you think your network has been hacked</h2>
+  <h2 id="fix">If you think you've been hacked</h2>
   <ol>
-    <li><strong>Factory-reset the router</strong> (usually a small reset button held for 10 to 30 seconds). Routers from your provider usually set themselves back up; with your own router, you'll need to set it up again.</li>
-    <li><strong>Immediately set new passwords</strong> for both the Wi-Fi and the router admin page.</li>
-    <li><strong>Update the router's firmware,</strong> then work through steps 2 to 4 above.</li>
-    <li><strong>Update and scan your devices</strong>, starting with computers. Change important passwords (email first) from a device you trust.</li>
+    <li>Factory-reset the router (hold the reset button for 10 to 30 seconds). Provider routers usually set themselves back up.</li>
+    <li>Set new Wi-Fi and admin passwords straight away.</li>
+    <li>Update the router's firmware, then go through steps 2 to 4.</li>
+    <li>Update and scan your computers, then change important passwords, email first.</li>
   </ol>
   <p><a class="button" href="/">Run the outside check</a></p>
 </section>

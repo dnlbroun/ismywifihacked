@@ -186,3 +186,21 @@ footer.site a { color: var(--accent); }
 .legend .pill { display: inline-block; min-width: 8.5rem; text-align: center; margin-right: 6px; }
 main a { color: var(--accent); }
 main a.button { color: var(--accent-text); }
+.isp-callout {
+  margin: 12px 0 0;
+  padding: 8px 12px;
+  border-left: 3px solid var(--accent);
+  background: var(--surface);
+  border-radius: 0 8px 8px 0;
+  max-width: 36rem;
+}
+.tag {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 1px 8px;
+  margin-left: 4px;
+  border-radius: 999px;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}

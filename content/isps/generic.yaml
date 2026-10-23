@@ -1,73 +1,56 @@
-# Generic fix steps, shown when we don't recognise the ISP or an ISP file has no
-# entry for a finding. Keep each step short and plain-English. Don't name specific
-# menu paths here: router admin pages differ by model.
+# Generic fix steps. Actions only: the card already explains the problem. No menu
+# paths here; those vary by router and live in the ISP files' `howto`.
 name: your internet provider
 asns: []
 
 steps:
   router_admin_exposed:
-    - Log in to your router's settings page from a device at home (the address is usually printed on a sticker on the router).
-    - Look for "Remote management", "Remote administration" or "Web access from WAN" and turn it off.
-    - If you can't find it, call your internet provider and ask them to disable remote management of your router.
+    - Sign in to your router's settings from home (the address is usually on the router's label).
+    - Turn off "Remote management", "Remote administration" or "Web access from WAN".
+    - If you can't find it, ask your internet provider to turn it off.
   telnet:
-    - Telnet is an old, unencrypted login service and should never be reachable from the internet.
     - Turn off Telnet or "remote access" in your router or device settings.
-    - If you didn't set this up yourself, restart the router, install firmware updates, and change the admin password.
+    - If you didn't set it up, update the router's firmware and change its admin password.
   tr069:
-    - Port 7547 is used by some ISPs to manage your router remotely, but it has been attacked by botnets.
     - Update your router's firmware.
-    - Ask your internet provider whether it should be open, and request a replacement router if it is old.
+    - Ask your internet provider whether port 7547 should be open, and for a newer router if yours is old.
   smb:
-    - Windows file sharing (port 445) should never be open to the internet.
-    - Remove any "port forwarding" rule for port 445 in your router.
-    - Check for a NAS or PC set as "DMZ host" and turn DMZ off.
+    - Remove any port-forwarding rule for port 445.
+    - If a NAS or PC is set as the "DMZ host", turn DMZ off.
   rdp:
-    - Remote Desktop (port 3389) open to the internet is a top target for ransomware.
-    - Remove the port-forwarding rule for 3389 in your router.
-    - If you need remote access, use a VPN or a remote-access app instead.
+    - Remove the port-forwarding rule for port 3389.
+    - For remote access, use a VPN or a remote-access app instead.
   upnp_wan:
-    - Your router is answering UPnP requests from the internet, which it should never do.
     - Update your router's firmware.
-    - Turn off UPnP in your router settings if you don't need it, or replace the router if updates aren't available.
+    - Turn off UPnP if you don't need it. If the router gets no updates, replace it.
   natpmp:
-    - Your router is answering NAT-PMP port-mapping requests from the internet.
-    - Update the router's firmware and turn off NAT-PMP / UPnP if you don't need it.
+    - Update your router's firmware and turn off NAT-PMP and UPnP if you don't need them.
   open_port:
-    - Something on your network is reachable from the internet on this port.
-    - If you didn't set this up on purpose, remove the matching "port forwarding" rule in your router.
-    - If you did, make sure the device is up to date and uses a strong password.
+    - If you didn't set this up, remove the matching port-forwarding rule.
+    - If you did, keep the device updated and use a strong password.
   adb:
-    - An Android device (often a TV box or streaming stick) has its debugging port open to the internet. Botnets take these over automatically.
-    - On the device, turn off "USB debugging" / "ADB debugging" / "Network debugging" in Developer options.
-    - Remove any port-forwarding rule for port 5555 in your router, and update or replace the device if it's an unbranded box.
+    - On the device, turn off "USB debugging", "ADB debugging" or "Network debugging" in Developer options.
+    - Remove any port-forwarding rule for port 5555. Replace unbranded TV boxes that don't get updates.
   vnc:
-    - A screen-sharing service (VNC) is reachable from the internet, which can let strangers see and control a computer.
-    - Turn off screen sharing / VNC on the computer, or remove the port-forwarding rule for it in your router.
-    - If you need remote access, use a VPN or a remote-access app with two-factor login.
+    - Turn off screen sharing (VNC), or remove its port-forwarding rule.
+    - For remote access, use a VPN or a remote-access app with two-factor login.
   camera_dvr:
-    - A security camera or video recorder is reachable from the internet. These are a top target for botnets and for strangers viewing your cameras.
-    - Update the camera or recorder's firmware and change its password to a long, unique one.
-    - Remove the port-forwarding rule for it in your router, and use the manufacturer's app or a VPN for remote viewing instead.
+    - Update the camera or recorder and give it a long, unique password.
+    - Remove its port-forwarding rule and view it through the manufacturer's app or a VPN instead.
   router_service:
-    - A router management service is reachable from the internet. Services like this have been exploited by botnets.
     - Update your router's firmware.
-    - Turn off remote management in the router, or ask your internet provider to. If the router no longer gets updates, replace it.
+    - Turn off remote management, or ask your provider to. Replace the router if it no longer gets updates.
   printer:
-    - A printer is reachable from the internet, so anyone can send it print jobs or probe it for weaknesses.
-    - Remove the port-forwarding rule for the printer in your router, and update its firmware.
+    - Remove the printer's port-forwarding rule and update its firmware.
   open_resolver:
-    - Your router answers DNS lookups for anyone on the internet ("open resolver"). Attackers abuse these to flood other websites.
-    - In your router's settings, turn off any option that offers DNS on the internet (WAN) side, and update its firmware.
-    - If you can't find the setting, ask your internet provider for help.
+    - Turn off any router option that offers DNS on the internet (WAN) side, and update its firmware.
+    - If you can't find it, ask your internet provider.
   history_vulns:
-    - Shodan, a search engine for internet-connected devices, matched software on your address to known security flaws.
-    - Update your router's firmware and any device you've made reachable from the internet (cameras, NAS, servers).
-    - Close anything you don't need open by removing its port-forwarding rule.
+    - Update your router and anything you've exposed to the internet (cameras, NAS, servers).
+    - Remove port-forwarding rules you don't need.
   dns_suspicious:
-    - Your internet lookups are going through a DNS server we don't recognise, which could mean your router's settings were changed.
-    - In your router's settings, set DNS back to "automatic" (from your provider) or a well-known service like 1.1.1.1 or 9.9.9.9.
-    - Change the router's admin password, and update its firmware.
+    - Set the router's DNS back to automatic, or to a known service like 1.1.1.1 or 9.9.9.9.
+    - Change the router's admin password and update its firmware.
   reputation_suspicious:
-    - Your internet address has been seen scanning or attacking other computers, which often means an infected device at home.
-    - Restart your router, update all devices, and run a malware scan on your computers.
-    - If you share this connection (apartment, office), the activity might come from someone else on it.
+    - Update every device, run a malware scan on your computers, and restart the router.
+    - Change your Wi-Fi password so unknown devices drop off.

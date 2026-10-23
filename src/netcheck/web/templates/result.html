@@ -1,12 +1,12 @@
 {% extends "base.html" %}
-{% block title %}Your results · Network Checkup{% endblock %}
+{% block title %}Your results · Is My Wi-Fi Hacked?{% endblock %}
 {% block main %}
 <section class="summary status-{{ report.overall }}">
   <p class="eyebrow">Your results</p>
   <h1>{{ report.overall_headline }}</h1>
   <dl class="meta">
     <div><dt>Connection</dt><dd>{{ report.addresses | join(", ") }}</dd></div>
-    <div><dt>Provider</dt><dd>{{ report.isp_name }}{% if report.network_name %} <span class="muted">({{ report.network_name }})</span>{% endif %}</dd></div>
+    <div><dt>Provider</dt><dd>{{ report.isp_name }}{% if report.network_name %} <span class="muted">({{ report.network_name }})</span>{% endif %}{% if report.isp_specific %} <span class="tag">Router-specific help included</span>{% endif %}</dd></div>
   </dl>
 </section>
 
@@ -32,7 +32,7 @@
       <div class="isp-help">
         <p class="isp-help-title">On your {{ card.isp_name }} router:</p>
         <ul>{% for line in card.isp_help %}<li>{{ line }}</li>{% endfor %}</ul>
-        <p class="muted small">Menu names can change between router models and app versions.</p>
+        <p class="muted small">Menu names vary by router model.</p>
       </div>
       {% endif %}
     </details>
@@ -41,13 +41,12 @@
   {% endfor %}
 </section>
 
-{% include "_wifi_check.html" %}
-<p><a href="/wifi">Read the full Wi-Fi guide</a>, including what to do if you think you've been hacked.</p>
-
-<section class="limits">
-  <h2>What we can't check</h2>
-  <ul>{% for item in cant_check %}<li>{{ item }}</li>{% endfor %}</ul>
-  <p class="muted">This page is private to anyone with the link and is deleted 24 hours after the scan.</p>
-  <p><a class="button" href="/">Run another check</a></p>
+<section class="wifi" id="wifi-check">
+  <h2>Next: check inside your Wi-Fi</h2>
+  <p>This scan can't see {% for item in cant_check %}{{ item }}{% if not loop.last %}, {% endif %}{% endfor %}.
+     The <a href="/wifi">Wi-Fi guide</a> walks you through checking those yourself in about 10 minutes.</p>
 </section>
+
+<p class="muted">This page is private to anyone with the link and is deleted 24 hours after the scan.</p>
+<p><a class="button" href="/">Run another check</a></p>
 {% endblock %}

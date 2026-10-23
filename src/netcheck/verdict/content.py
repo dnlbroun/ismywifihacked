@@ -51,6 +51,10 @@ class IspContent:
             )
         return cls(isps)
 
+    def supported_names(self) -> list[str]:
+        """ISPs we have router-specific instructions for."""
+        return sorted(i.name for i in self._isps.values() if i.howto)
+
     def isp(self, slug: str) -> Isp:
         return self._isps.get(slug, self.generic)
 

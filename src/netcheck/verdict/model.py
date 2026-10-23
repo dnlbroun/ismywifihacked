@@ -16,10 +16,13 @@ class Status(enum.StrEnum):
     GOOD = "good"
     WARN = "warn"
     BAD = "bad"
+    # We were kept out, which is usually what a protected network looks like.
+    # Reassuring, but still never presented as a pass.
+    QUIET = "quiet"
     UNKNOWN = "unknown"  # couldn't check: never presented as a pass
 
 
-_RANK = {Status.GOOD: 0, Status.UNKNOWN: 1, Status.WARN: 2, Status.BAD: 3}
+_RANK = {Status.GOOD: 0, Status.QUIET: 1, Status.UNKNOWN: 2, Status.WARN: 3, Status.BAD: 4}
 
 
 @dataclass
@@ -31,6 +34,10 @@ class Card:
     facts: list[str] = field(default_factory=list)
     steps: list[str] = field(default_factory=list)
     note: str | None = None
+    label: str | None = None  # overrides the default status label on the pill
+    fix_keys: list[str] = field(default_factory=list)  # which generic fixes apply
+    isp_help: list[str] = field(default_factory=list)  # "On your <ISP> router:" steps
+    isp_name: str | None = None
 
 
 @dataclass
@@ -54,7 +61,12 @@ class Report:
         if Status.WARN in statuses:
             return "Nothing urgent, but a few things are worth a look."
         if Status.UNKNOWN in statuses or not statuses:
-            return "We didn't find problems, but we couldn't check everything (see below)."
+            return "We didn't find problems, but some checks didn't work (see below)."
+        if Status.QUIET in statuses:
+            return (
+                "We didn't find anything wrong. Your network kept us out, which is "
+                "usually a good sign."
+            )
         return "Everything we could check looks good."
 
     def to_json(self) -> dict[str, Any]:

@@ -1,7 +1,15 @@
 name: Spectrum (Charter)
 asns: [20115, 11351, 11426, 10796, 12271, 20001, 33363]
 
-# TODO: ISP-specific steps, verified against the provider's current router/app docs.
-# Any finding missing here falls back to generic.yaml. Use the same keys as generic.yaml
-# (see generic.yaml for the full list). Don't guess admin-panel paths.
+# From Spectrum's support pages. Some app versions hide Advanced Settings; if it's
+# missing, Spectrum support can change these for you.
+howto:
+  login: Spectrum routers are managed in the My Spectrum app, under the Services tab.
+  upnp: "My Spectrum app > Services > your WiFi network > Advanced Settings > UPnP: turn it off."
+  port_forwarding: "My Spectrum app > Services > your WiFi network > Advanced Settings > Port Forwarding: delete any rule you don't recognise."
+  dns: "My Spectrum app > Services > your WiFi network > Advanced Settings > DNS: make sure it isn't set to servers you don't recognise."
+sources:
+  - https://www.spectrum.net/support/internet/managing-advanced-settings-my-spectrum-app
+  - https://www.spectrum.net/support/internet/advanced-home-wifi-advanced-settings
+
 steps: {}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}How it works · Is My Wi-Fi Hacked?{% endblock %}
+{% block main %}
+<section class="hero">
+  <h1>How the check works</h1>
+  <p class="lede">We look at your connection from the outside, the way a stranger on the internet would. Here's exactly what that means, and what it can't tell you.</p>
+</section>
+
+<section class="guide">
+  <h2>What we check</h2>
+  <dl class="checks-dl">
+    <dt>Open doors</dt>
+    <dd>We try to connect to about 30 common entry points (router admin pages, remote desktop, file sharing, cameras, printers, Android TV boxes and more),
+        and ask whether your router answers UPnP, NAT-PMP or DNS requests from the internet. We only check whether something answers. We never try passwords or break in.
+        If your connection has both an IPv4 and an IPv6 address, we check both.</dd>
+    <dt>DNS hijacking</dt>
+    <dd>Your browser looks up a random one-time name on our own DNS server, so we can see which DNS service answered for you, and whether it's your provider,
+        a well-known public service, or something unexpected.</dd>
+    <dt>Botnet and abuse reports</dt>
+    <dd>We look up your address with GreyNoise (has it been seen scanning the internet?) and AbuseIPDB (has anyone reported it for attacks?).</dd>
+    <dt>History</dt>
+    <dd>We ask Shodan, a search engine for internet-connected devices, what it has seen open on your address in the past week, including things our quick check doesn't cover.</dd>
+  </dl>
+
+  <h2>What the colours mean</h2>
+  <ul class="legend">
+    <li><span class="pill status-good">Looks good</span> We checked, and found nothing wrong.</li>
+    <li><span class="pill status-quiet">Nothing visible</span> Your network kept us out. That's usually a good sign, but we can't call it a pass.</li>
+    <li><span class="pill status-warn">Worth a look</span> Something is reachable or reported that may be fine if you set it up on purpose.</li>
+    <li><span class="pill status-bad">Fix this</span> Something risky is exposed, with steps to fix it.</li>
+    <li><span class="pill status-unknown">Couldn't check</span> A check failed or a service didn't answer. We never turn that into a pass.</li>
+  </ul>
+
+  <h2>What we can't check</h2>
+  <ul>{% for item in cant_check %}<li>{{ item }}</li>{% endfor %}</ul>
+  <p>That's why every result includes a <a href="/wifi">Wi-Fi self-check</a>.</p>
+
+  <h2 id="privacy">Privacy</h2>
+  <ul>
+    <li>We only scan the address you're connecting from, and only after you click "Scan me". There's no way to point the scan at anyone else.</li>
+    <li>We don't store your IP address. For rate limiting we keep a scrambled version we can't reverse, and drop it within a day.</li>
+    <li>Results live at a private link for 24 hours, then they're deleted. We keep only daily totals (how many results were green or red), never who got them.</li>
+    <li>To check reputation and history, we send your address to {{ lookup_services }}.</li>
+    <li>No ads, analytics, trackers or accounts.</li>
+  </ul>
+
+  <h2>Open source</h2>
+  <p>All of the code is public on <a href="https://github.com/dnlbroun/ismywifihacked">GitHub</a>, so you can see exactly what the check does.</p>
+  <p><a class="button" href="/">Run the check</a></p>
+</section>
+{% endblock %}

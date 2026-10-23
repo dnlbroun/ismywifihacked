@@ -142,3 +142,7 @@ operators.)
   purpose: it would record visitor IPs.
 - Results expire after 24h and rate-limit entries after 1h. Both are in-process or
   SQLite under `/var/lib/netcheck`, purged automatically.
+
+## License
+
+MIT. See [LICENSE](LICENSE).

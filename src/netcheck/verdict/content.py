@@ -2,10 +2,15 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import yaml
+
+HOWTO_KEYS = frozenset(
+    {"login", "remote_management", "upnp", "port_forwarding", "dmz", "dns", "devices",
+     "wifi_security", "wps", "firmware"}
+)  # fmt: skip
 
 
 @dataclass(frozen=True)
@@ -13,6 +18,8 @@ class Isp:
     slug: str
     name: str
     steps: dict[str, list[str]]
+    howto: dict[str, str] = field(default_factory=dict)
+    sources: list[str] = field(default_factory=list)
 
 
 class IspContent:
@@ -31,7 +38,17 @@ class IspContent:
         for f in sorted((content_dir / "isps").glob("*.yaml")):
             data = yaml.safe_load(f.read_text(encoding="utf-8")) or {}
             steps = {str(k): [str(s) for s in v] for k, v in (data.get("steps") or {}).items() if v}
-            isps[f.stem] = Isp(slug=f.stem, name=str(data["name"]), steps=steps)
+            howto = {str(k): str(v) for k, v in (data.get("howto") or {}).items()}
+            unknown = set(howto) - HOWTO_KEYS
+            if unknown:
+                raise ValueError(f"{f.name}: unknown howto keys {sorted(unknown)}")
+            isps[f.stem] = Isp(
+                slug=f.stem,
+                name=str(data["name"]),
+                steps=steps,
+                howto=howto,
+                sources=[str(u) for u in data.get("sources") or []],
+            )
         return cls(isps)
 
     def isp(self, slug: str) -> Isp:

@@ -186,7 +186,7 @@ def exposure_card(o: ExposureOutcome, content: IspContent, isp_slug: str) -> Car
             "Turn off the VPN and run the check again to test your own connection.",
         )
     if o.skipped is SkipReason.CGNAT:
-        return _cant_see(key, title, fam, carrier=True)
+        return _cant_see(key, title, fam, carrier=True, probes=None)
     if o.skipped is SkipReason.ERROR or o.result is None:
         return Card(
             key,
@@ -216,7 +216,7 @@ def exposure_card(o: ExposureOutcome, content: IspContent, isp_slug: str) -> Car
 
     if not open_ports and not ssdp and not natpmp and not open_resolver and not dns_port:
         if o.cgnat_asn or not r.any_response:
-            return _cant_see(key, title, fam, carrier=o.cgnat_asn)
+            return _cant_see(key, title, fam, carrier=o.cgnat_asn, probes=len(r.ports))
         if not r.complete:
             return Card(
                 key,
@@ -289,26 +289,40 @@ def exposure_card(o: ExposureOutcome, content: IspContent, isp_slug: str) -> Car
         headline,
         facts=facts,
         steps=_steps(content, isp_slug, fix_keys),
+        fix_keys=list(dict.fromkeys(fix_keys)),
         note=note,
     )
 
 
-def _cant_see(key: str, title: str, fam: str, *, carrier: bool) -> Card:
-    why = (
-        "Your provider shares one internet address among many customers (carrier-grade NAT), "
-        "so your router isn't directly reachable."
-        if carrier
-        else "Nothing answered at all. That usually means a firewall is silently dropping "
-        "connections, or your provider uses carrier-grade NAT."
-    )
+def _cant_see(key: str, title: str, fam: str, *, carrier: bool, probes: int | None) -> Card:
+    if carrier:
+        return Card(
+            key,
+            title,
+            Status.QUIET,
+            f"Your router is hidden behind your provider's network ({fam}).",
+            facts=[
+                "Your provider shares internet addresses among many customers (carrier-grade "
+                "NAT), so nobody on the internet, including us, can reach your router directly."
+            ],
+            note="That protects you from the kind of exposure this check looks for. It also "
+            "means we couldn't test the router itself.",
+            label="Hidden",
+        )
+    tried = f"{probes} common entry points" if probes else "common entry points"
     return Card(
         key,
         title,
-        Status.UNKNOWN,
-        f"We can't see your router from the internet over {fam}.",
-        facts=[why],
-        note="That's generally good for security, but it means we couldn't test what's "
-        "open, so this is not a pass.",
+        Status.QUIET,
+        f"Nothing on your network answered us from the internet ({fam}).",
+        facts=[
+            f'We tried {tried} and got no reply at all, not even a "closed".',
+            "That's what a well-protected home network normally looks like: your router "
+            "silently ignores strangers.",
+        ],
+        note="We can't promise nothing is open: the same silence happens when your provider "
+        "shares one address among many customers, which also keeps your router out of reach.",
+        label="Nothing visible",
     )
 
 
@@ -321,54 +335,139 @@ def _steps(content: IspContent, isp_slug: str, keys: list[str]) -> list[str]:
     return out
 
 
-# --- reputation ----------------------------------------------------------------
+# --- botnet & abuse (GreyNoise + AbuseIPDB) ---------------------------------------
 
 
-def reputation_card(r: ReputationResult | None, content: IspContent, isp_slug: str) -> Card:
-    title = "Botnet & reputation"
-    key = "reputation"
-    if r is None or r.verdict is Reputation.UNKNOWN:
-        reason = r.reason if r else None
-        note = (
-            "The reputation service only supports IPv4 addresses, and we couldn't see yours."
-            if reason == "ipv6_unsupported"
-            else "The reputation service didn't answer properly, so we couldn't check."
-        )
-        return Card(
-            key, title, Status.UNKNOWN, "We couldn't check your address's reputation.", note=note
-        )
+def _greynoise_fact(r: ReputationResult) -> str:
     if r.verdict is Reputation.CLEAN:
+        return "GreyNoise: not seen scanning or attacking the internet."
+    details = ", ".join(
+        x
+        for x in (
+            f"classification: {r.classification}" if r.classification else None,
+            f"associated with {r.name}" if r.name and r.name.lower() != "unknown" else None,
+            f"last seen {r.last_seen}" if r.last_seen else None,
+        )
+        if x
+    )
+    what = (
+        "belongs to a business service or VPN"
+        if r.verdict is Reputation.BUSINESS_OR_VPN
+        else "seen scanning or attacking the internet"
+    )
+    return f"GreyNoise: {what}" + (f" ({details})." if details else ".")
+
+
+def _abuse_fact(r: AbuseResult) -> str:
+    if r.verdict is Abuse.NO_REPORTS:
+        if r.reports == 0:
+            return "AbuseIPDB: no reports in the last 30 days."
+        return f"AbuseIPDB: {r.reports} old or low-trust reports, rated 0/100."
+    fact = (
+        f"AbuseIPDB: {r.reports} report{'s' if r.reports != 1 else ''} from {r.reporters} "
+        f"reporter{'s' if r.reporters != 1 else ''} in the last 30 days "
+        f"(confidence {r.score}/100"
+    )
+    fact += f", most recent {r.last_reported})." if r.last_reported else ")."
+    return fact
+
+
+def botnet_card(
+    gn: ReputationResult | None,
+    ab: AbuseResult | None,
+    *,
+    abuse_enabled: bool,
+    content: IspContent,
+    isp_slug: str,
+) -> Card:
+    """One card for "has this address been attacking people?", from up to two sources.
+
+    The card shows the worse of the answers we got; it's "couldn't check" only when
+    no source answered.
+    """
+    title = "Botnet & abuse reports"
+    key = "reputation"
+    gn_ok = gn is not None and gn.verdict is not Reputation.UNKNOWN
+    ab_ok = abuse_enabled and ab is not None and ab.verdict is not Abuse.UNKNOWN
+
+    if not gn_ok and not ab_ok:
+        ipv6_only = gn is not None and gn.reason == "ipv6_unsupported" and not abuse_enabled
         return Card(
             key,
             title,
-            Status.GOOD,
-            "Your internet address hasn't been seen scanning or attacking other computers.",
-            note="Source: GreyNoise. This doesn't rule out a quiet infection.",
+            Status.UNKNOWN,
+            "We couldn't check whether your address has been attacking other computers.",
+            note=(
+                "The reputation service only supports IPv4 addresses, and we couldn't see yours."
+                if ipv6_only
+                else "The reputation services didn't answer properly this time."
+            ),
         )
-    facts = []
-    if r.classification:
-        facts.append(f"GreyNoise classification: {r.classification}.")
-    if r.name and r.name.lower() != "unknown":
-        facts.append(f"Associated with: {r.name}.")
-    if r.last_seen:
-        facts.append(f"Last seen: {r.last_seen}.")
-    if r.verdict is Reputation.BUSINESS_OR_VPN:
+
+    facts: list[str] = []
+    status = Status.GOOD
+    if gn_ok and gn is not None:
+        facts.append(_greynoise_fact(gn))
+        if gn.verdict is Reputation.SUSPICIOUS:
+            status = Status.BAD
+        elif gn.verdict is Reputation.BUSINESS_OR_VPN:
+            status = Status.WARN
+    if ab_ok and ab is not None:
+        facts.append(_abuse_fact(ab))
+        if ab.verdict is Abuse.SUSPICIOUS:
+            status = Status.BAD
+        elif ab.verdict is Abuse.LOW_CONFIDENCE and status is Status.GOOD:
+            status = Status.WARN
+        if ab.is_tor:
+            facts.append(
+                "Your address is a Tor exit node, which attracts reports about other people's traffic."
+            )
+
+    notes = []
+    if abuse_enabled and gn_ok != ab_ok:
+        missing, used = ("GreyNoise", "AbuseIPDB") if ab_ok else ("AbuseIPDB", "GreyNoise")
+        notes.append(f"{missing} didn't answer, so this is based on {used} alone.")
+
+    if status is Status.BAD:
+        notes.append(
+            "If you share this connection (apartment, office, mobile data, VPN), the activity "
+            "may come from someone else using the same address."
+        )
+        return Card(
+            key,
+            title,
+            Status.BAD,
+            "Your address has been seen or reported attacking other computers.",
+            facts=facts,
+            steps=content.steps(isp_slug, "reputation_suspicious"),
+            fix_keys=["reputation_suspicious"],
+            note=" ".join(notes),
+        )
+    if status is Status.WARN:
+        business = gn_ok and gn is not None and gn.verdict is Reputation.BUSINESS_OR_VPN
+        notes.append(
+            "If you're on a VPN or work network, this is about that network, not your home."
+            if business
+            else "Low-confidence reports are often about someone who had your address before you."
+        )
         return Card(
             key,
             title,
             Status.WARN,
-            "Your address belongs to a business service or VPN, not a typical home connection.",
+            "Your address belongs to a business service or VPN, not a typical home connection."
+            if business
+            else "Your address has a few low-confidence abuse reports.",
             facts=facts,
-            note="If you're on a VPN or work network, this result is about that network, "
-            "not your home.",
+            note=" ".join(notes),
         )
+    notes.append("This doesn't rule out a quiet infection that isn't attacking anyone.")
     return Card(
         key,
         title,
-        Status.BAD,
-        "Your internet address has been seen scanning or attacking other computers.",
+        Status.GOOD,
+        "Your address hasn't been seen or reported attacking other computers.",
         facts=facts,
-        steps=content.steps(isp_slug, "reputation_suspicious"),
+        note=" ".join(notes),
     )
 
 
@@ -416,67 +515,9 @@ def history_card(r: HistoryResult | None, content: IspContent, isp_slug: str) ->
         + (" Some may have known security flaws." if r.vulns else ""),
         facts=facts,
         steps=_steps(content, isp_slug, keys),
+        fix_keys=list(dict.fromkeys(keys)),
         note="Shodan's data is up to a week old, and flaws are matched by software version, so "
         "they may already be fixed. Anyone can look this up, including attackers.",
-    )
-
-
-# --- AbuseIPDB ---------------------------------------------------------------------
-
-
-def abuse_card(r: AbuseResult | None, content: IspContent, isp_slug: str) -> Card:
-    title = "Abuse reports"
-    key = "abuse"
-    if r is None or r.verdict is Abuse.UNKNOWN:
-        return Card(
-            key,
-            title,
-            Status.UNKNOWN,
-            "We couldn't check for abuse reports.",
-            note="The AbuseIPDB lookup didn't work this time (it has a daily limit).",
-        )
-    if r.verdict is Abuse.NO_REPORTS:
-        return Card(
-            key,
-            title,
-            Status.GOOD,
-            "Nobody has reported your address for attacks or abuse in the last 30 days."
-            if r.reports == 0
-            else "Your address has old or low-trust reports that AbuseIPDB rates 0/100.",
-            note="Source: AbuseIPDB, where network operators report addresses that attack them.",
-        )
-    facts = [
-        f"{r.reports} report{'s' if r.reports != 1 else ''} from {r.reporters} "
-        f"reporter{'s' if r.reporters != 1 else ''} in the last 30 days "
-        f"(confidence score {r.score}/100)."
-    ]
-    if r.last_reported:
-        facts.append(f"Most recent report: {r.last_reported}.")
-    if r.is_tor:
-        facts.append(
-            "Your address is a Tor exit node, which attracts reports from other people's traffic."
-        )
-    shared = (
-        "If you share this connection (apartment, office, mobile data, VPN), the reports may "
-        "be about someone else using the same address."
-    )
-    if r.verdict is Abuse.SUSPICIOUS:
-        return Card(
-            key,
-            title,
-            Status.BAD,
-            "Your address has been reported for attacking other computers.",
-            facts=facts,
-            steps=content.steps(isp_slug, "reputation_suspicious"),
-            note=shared,
-        )
-    return Card(
-        key,
-        title,
-        Status.WARN,
-        "Your address has some abuse reports, but AbuseIPDB rates them low-confidence.",
-        facts=facts,
-        note=shared,
     )
 
 
@@ -547,6 +588,7 @@ def dns_card(o: DnsOutcome, classes: AsnClasses, content: IspContent, isp_slug: 
             "setting may have been changed.",
             facts=facts,
             steps=content.steps(isp_slug, "dns_suspicious"),
+            fix_keys=["dns_suspicious"],
             note="This can also be harmless: some workplaces, schools, VPNs and security "
             "products use their own DNS servers.",
         )
@@ -554,13 +596,14 @@ def dns_card(o: DnsOutcome, classes: AsnClasses, content: IspContent, isp_slug: 
         return Card(
             key,
             title,
-            Status.UNKNOWN,
-            "Your browser looked us up through a secure-DNS provider, so we couldn't test "
-            "your router's DNS setting.",
+            Status.QUIET,
+            "Your lookups go to a trusted secure-DNS service, so a hijacked router setting "
+            "wouldn't affect this browser.",
             facts=facts,
-            note="Browsers like Firefox and Chrome can send lookups straight to Cloudflare, "
-            "Google or NextDNS, bypassing the router. That's fine, but it hides what the "
-            "router is set to.",
+            note="This is either your browser's built-in secure DNS (Firefox and Chrome both "
+            "have it) or a setting you chose. Both are fine. If it's the browser, other "
+            "devices at home may still use the router's setting, which we can't test from here.",
+            label="Protected",
         )
     return Card(
         key,
@@ -579,3 +622,35 @@ def _resolver_fact(r: ResolverSighting) -> str:
     else:
         who = r.asn.name if r.asn else "an unknown network"
     return f"DNS server {r.ip} ({who})."
+
+
+# --- ISP-specific help -------------------------------------------------------------
+
+# Which router how-to snippets help with each kind of fix.
+HOWTO_TOPICS: dict[str, list[str]] = {
+    "router_admin_exposed": ["remote_management"],
+    "router_service": ["remote_management"],
+    "telnet": ["remote_management", "port_forwarding"],
+    "upnp_wan": ["upnp"],
+    "natpmp": ["upnp"],
+    "dns_suspicious": ["dns"],
+    "reputation_suspicious": ["devices"],
+    **{
+        k: ["port_forwarding", "dmz"]
+        for k in ("smb", "rdp", "vnc", "adb", "camera_dvr", "printer", "open_port", "history_vulns")
+    },
+}
+
+
+def attach_isp_help(cards: list[Card], content: IspContent, isp_slug: str) -> None:
+    """Add "On your <ISP> router:" instructions to cards that have fix steps."""
+    isp = content.isp(isp_slug)
+    if not isp.howto:
+        return
+    for c in cards:
+        topics = dict.fromkeys(t for k in c.fix_keys for t in HOWTO_TOPICS.get(k, []))
+        lines = [isp.howto[t] for t in topics if t in isp.howto]
+        if lines:
+            login = isp.howto.get("login")
+            c.isp_help = ([login] if login else []) + lines
+            c.isp_name = isp.name

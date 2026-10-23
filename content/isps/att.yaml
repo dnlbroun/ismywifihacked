@@ -1,7 +1,13 @@
 name: AT&T
 asns: [7018]
 
-# TODO: ISP-specific steps, verified against the provider's current router/app docs.
-# Any finding missing here falls back to generic.yaml. Use the same keys as generic.yaml
-# (see generic.yaml for the full list). Don't guess admin-panel paths.
+# AT&T's own pages didn't turn up; these match several independent guides. Menu
+# names vary by gateway model (BGW210, BGW320, ...).
+howto:
+  login: Connect to your home Wi-Fi and open 192.168.1.254. Changing settings asks for the Device Access Code printed on the gateway's label.
+  port_forwarding: "Firewall > NAT/Gaming shows port forwarding rules. Remove any you don't recognise (menu names vary by gateway model)."
+sources:
+  - https://natchecker.com/blog/att-port-forwarding
+  - https://speedtesthq.com/guides/routers/att-router
+
 steps: {}

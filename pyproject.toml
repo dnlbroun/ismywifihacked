@@ -6,6 +6,8 @@ authors = [
     { name = "Daniel Broun" }
 ]
 requires-python = ">=3.12"
+license = "MIT"
+license-files = ["LICENSE"]
 dependencies = [
     "cryptography>=50.0.2",
     "defusedxml>=0.7.1",

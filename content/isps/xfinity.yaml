@@ -1,7 +1,15 @@
 name: Xfinity (Comcast)
 asns: [7922]
 
-# TODO: ISP-specific steps, verified against the provider's current router/app docs.
-# Any finding missing here falls back to generic.yaml. Use the same keys as generic.yaml
-# (see generic.yaml for the full list). Don't guess admin-panel paths.
+# Short, verified how-to snippets for this ISP's own router. Only include what a
+# source below confirms; anything missing falls back to the generic steps.
+howto:
+  login: Use the Xfinity app, or connect to your home Wi-Fi and open 10.0.0.1 in a browser to sign in to the Admin Tool.
+  upnp: In the Admin Tool (10.0.0.1), go to Advanced > Device Discovery, turn UPnP off, and click Save.
+  port_forwarding: "In the Xfinity app: WiFi > View WiFi equipment > Advanced settings > Port forwarding. Delete any rule you don't recognise."
+  devices: The Xfinity app's WiFi section lists the devices connected to your network.
+sources:
+  - https://www.xfinity.com/support/articles/configure-device-discovery-for-wifi
+  - https://forums.xfinity.com/conversations/internet/answered-how-to-set-up-port-forwarding-on-your-xfinity-gateway/602da6cdc5375f08cdd20bc2
+
 steps: {}

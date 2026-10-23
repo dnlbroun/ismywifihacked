@@ -15,7 +15,7 @@
   <article class="card status-{{ card.status }}" id="{{ card.key }}">
     <header>
       <h2>{{ card.title }}</h2>
-      <span class="pill">{{ status_labels[card.status] }}</span>
+      <span class="pill">{{ card.label or status_labels[card.status] }}</span>
     </header>
     <p class="headline">{{ card.headline }}</p>
     {% if card.facts %}
@@ -28,6 +28,13 @@
     <details class="fix" open>
       <summary>How to fix</summary>
       <ol>{% for step in card.steps %}<li>{{ step }}</li>{% endfor %}</ol>
+      {% if card.isp_help %}
+      <div class="isp-help">
+        <p class="isp-help-title">On your {{ card.isp_name }} router:</p>
+        <ul>{% for line in card.isp_help %}<li>{{ line }}</li>{% endfor %}</ul>
+        <p class="muted small">Menu names can change between router models and app versions.</p>
+      </div>
+      {% endif %}
     </details>
     {% endif %}
   </article>
@@ -35,6 +42,7 @@
 </section>
 
 {% include "_wifi_check.html" %}
+<p><a href="/wifi">Read the full Wi-Fi guide</a>, including what to do if you think you've been hacked.</p>
 
 <section class="limits">
   <h2>What we can't check</h2>

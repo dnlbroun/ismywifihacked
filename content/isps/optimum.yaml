@@ -1,7 +1,11 @@
 name: Optimum
 asns: [6128]
 
-# TODO: ISP-specific steps, verified against the provider's current router/app docs.
-# Any finding missing here falls back to generic.yaml. Use the same keys as generic.yaml
-# (see generic.yaml for the full list). Don't guess admin-panel paths.
+# From Optimum's FAQ. Router menus beyond port forwarding weren't documented.
+howto:
+  login: Optimum routers are managed online at optimum.net/mynetwork (sign in with your Optimum ID).
+  port_forwarding: Sign in at optimum.net/mynetwork and check the port forwarding section at the bottom of the page. Delete any rule you don't recognise.
+sources:
+  - https://faq.optimum.net/node/13336
+
 steps: {}

@@ -22,13 +22,13 @@ from netcheck.verdict.cards import (
     DnsOutcome,
     ExposureOutcome,
     SkipReason,
-    abuse_card,
+    attach_isp_help,
+    botnet_card,
     classify_resolver,
     dns_card,
     exposure_card,
     history_card,
     mask_ip,
-    reputation_card,
 )
 from netcheck.verdict.content import IspContent
 from netcheck.verdict.model import Report
@@ -102,12 +102,19 @@ async def run_checkup(
         exp_ts = [tg.create_task(_exposure(deps, t, asn[t.version])) for t in targets]
 
     cards = [
-        reputation_card(rep_t.result(), deps.content, isp_slug),
-        *([abuse_card(abuse_t.result(), deps.content, isp_slug)] if abuse_t else []),
+        botnet_card(
+            rep_t.result(),
+            abuse_t.result() if abuse_t else None,
+            abuse_enabled=abuse_t is not None,
+            content=deps.content,
+            isp_slug=isp_slug,
+        ),
         history_card(hist_t.result(), deps.content, isp_slug),
         dns_card(dns_t.result(), deps.classes, deps.content, isp_slug),
         *(exposure_card(t.result(), deps.content, isp_slug) for t in exp_ts),
     ]
+
+    attach_isp_help(cards, deps.content, isp_slug)
 
     # For a recognised ISP show its friendly name plus the network name; otherwise the
     # network name from the ASN database is the best label we have.

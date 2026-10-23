@@ -1,7 +1,17 @@
 name: Verizon Fios
 asns: [701]
 
-# TODO: ISP-specific steps, verified against the provider's current router/app docs.
-# Any finding missing here falls back to generic.yaml. Use the same keys as generic.yaml
-# (see generic.yaml for the full list). Don't guess admin-panel paths.
+# Menu names from Verizon's router user guide (CR1000A, 2025). Older Fios routers
+# have similar menus.
+howto:
+  login: Connect to your home Wi-Fi, open mynetworksettings.com (or https://192.168.1.1) and sign in with the admin password on the label on the back of the router.
+  remote_management: "Advanced > System > Remote Administration: clear \"Allow Incoming WAN Access to Web-Management\", then click Apply Changes."
+  upnp: "Advanced > Devices > Universal Plug & Play: untick \"UPnP Enabled\", then click Apply Changes."
+  port_forwarding: "Advanced > Security & Firewall > Port Forwarding Rules: delete any rule you don't recognise."
+  dmz: "Advanced > Security & Firewall > DMZ Host: make sure it's disabled."
+  devices: Basic > Devices lists everything connected to your network.
+  wifi_security: In the Wi-Fi settings, click the Security setup button and choose WPA2 or WPA3.
+sources:
+  - https://www.verizon.com/content/dam/verizon/support/consumer/documents/internet/verizon-router-guide.pdf
+
 steps: {}

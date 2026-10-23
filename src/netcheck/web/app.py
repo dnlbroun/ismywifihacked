@@ -50,6 +50,7 @@ STATUS_LABELS = {
     "good": "Looks good",
     "warn": "Worth a look",
     "bad": "Fix this",
+    "quiet": "Nothing visible",
     "unknown": "Couldn't check",
 }
 
@@ -182,6 +183,23 @@ def create_app(
         )
         resp.set_cookie(CSRF_COOKIE, token, secure=True, httponly=True, samesite="strict", path="/")
         return resp
+
+    @app.api_route("/wifi", methods=["GET", "HEAD"], response_class=HTMLResponse)
+    async def wifi_guide(request: Request) -> HTMLResponse:
+        # Detect the visitor's ISP to show its router instructions. The address is
+        # looked up in memory and never stored or logged.
+        isp = None
+        try:
+            ip = client_ip(request)
+            slug = state().deps.classes.isp_slug(state().deps.asn_db.lookup(ip))
+            isp = state().deps.content.isp(slug) if slug != "generic" else None
+        except ClientIpError:
+            pass
+        return render("wifi.html", isp=isp)
+
+    @app.api_route("/how-it-works", methods=["GET", "HEAD"], response_class=HTMLResponse)
+    async def how_it_works() -> HTMLResponse:
+        return render("how.html")
 
     @app.post("/api/claim")
     async def claim(request: Request) -> JSONResponse:

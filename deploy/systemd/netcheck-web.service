@@ -1,0 +1,53 @@
+[Unit]
+Description=Network Checkup web app
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=netcheck-web
+Group=netcheck-web
+# Read access to the DNS server's token database (group-readable, never writable).
+SupplementaryGroups=netcheck-dns
+EnvironmentFile=/etc/netcheck/netcheck.env
+Environment=DATA_DIR=/var/lib/netcheck
+Environment=ASN_DB_PATH=/var/lib/netcheck/asn/ip2asn-combined.tsv.gz
+Environment=CONTENT_DIR=/opt/netcheck/app/content
+WorkingDirectory=/opt/netcheck/app
+ExecStart=/opt/netcheck/app/.venv/bin/python -m netcheck.web
+Restart=on-failure
+RestartSec=2
+StateDirectory=netcheck/app
+StateDirectoryMode=0700
+UMask=0077
+MemoryMax=600M
+
+# Sandboxing
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+ProtectProc=invisible
+ProcSubset=pid
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+RemoveIPC=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+CapabilityBoundingSet=
+AmbientCapabilities=
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged @resources
+
+[Install]
+WantedBy=multi-user.target

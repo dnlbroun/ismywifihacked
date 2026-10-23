@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>{% block title %}Is My Wi-Fi Hacked? Free network checkup{% endblock %}</title>
+  <link rel="stylesheet" href="/static/style.css">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <header class="site">
+    <a class="brand" href="/">Network Checkup</a>
+  </header>
+  <main>
+    {% block main %}{% endblock %}
+  </main>
+  <footer class="site">
+    <section class="privacy" id="privacy">
+      <h2>Privacy</h2>
+      <p>We only scan the internet address you're connecting from, and only when you click the button.
+         We don't keep your IP address: for rate limiting we store a scrambled version that we can't reverse,
+         and delete it within a day. Results are kept for 24 hours at a private link, then deleted.
+         Results can include names your devices broadcast (like a router model), so share the link with care.
+         To check your address's reputation and history we look it up with {{ lookup_services }}. We keep only daily totals of results (how many were green or red), never who got them. There are no ads, analytics or trackers.</p>
+      <p>This site is open source: <a href="https://github.com/dnlbroun/ismywifihacked">read the code on GitHub</a>.</p>
+    </section>
+  </footer>
+</body>
+</html>

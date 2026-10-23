@@ -1,0 +1,7 @@
+name: Spectrum (Charter)
+asns: [20115, 11351, 11426, 10796, 12271, 20001, 33363]
+
+# TODO: ISP-specific steps, verified against the provider's current router/app docs.
+# Any finding missing here falls back to generic.yaml. Use the same keys as generic.yaml
+# (see generic.yaml for the full list). Don't guess admin-panel paths.
+steps: {}

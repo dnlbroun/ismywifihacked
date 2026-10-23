@@ -1,0 +1,55 @@
+# Curated ASN groupings. Edit freely; loaded at startup.
+# Sources: public ASN registries (bgp.he.net / PeeringDB). Re-verify before relying on an entry.
+
+# Mobile / satellite carriers that put subscribers behind carrier-grade NAT.
+# For these, "nothing answered" means "we can't see your router", never a pass.
+cgnat_asns:
+  - 21928   # T-Mobile USA
+  - 6167    # Verizon Wireless (Cellco)
+  - 22394   # Verizon Wireless (Cellco)
+  - 20057   # AT&T Mobility
+  - 14593   # Starlink (SpaceX)
+
+# Resolvers that are fine to use. A resolver in the visitor's own ASN is also fine.
+public_resolver_asns:
+  15169: Google Public DNS
+  13335: Cloudflare (1.1.1.1)
+  19281: Quad9
+  36692: Cisco OpenDNS
+  34939: NextDNS
+  212772: AdGuard DNS
+  398962: Control D
+
+# Providers that browsers commonly use for built-in secure DNS (DoH). If the resolver
+# we see is one of these, the browser may be bypassing the router's DNS setting, so
+# we report "couldn't test" rather than "clean".
+browser_doh_asns:
+  - 13335
+  - 15169
+  - 34939   # NextDNS (offered in Firefox)
+
+# Datacenter / VPN exits. If the visitor's IP is in one of these we skip the port scan:
+# we'd be scanning the VPN or cloud provider, not the visitor's network.
+hosting_asns:
+  - 16509   # Amazon
+  - 14618   # Amazon
+  - 396982  # Google Cloud
+  - 8075    # Microsoft
+  - 14061   # DigitalOcean
+  - 63949   # Akamai / Linode
+  - 20473   # Vultr (Choopa)
+  - 16276   # OVH
+  - 24940   # Hetzner
+  - 60781   # Leaseweb
+  - 9009    # M247 (common VPN host)
+  - 60068   # Datacamp / CDN77 (common VPN host)
+  - 31898   # Oracle Cloud
+  - 13335   # Cloudflare (WARP)
+
+# Case-insensitive substrings of the AS description that indicate hosting.
+hosting_name_keywords:
+  - hosting
+  - datacenter
+  - data center
+  - vps
+  - colocation

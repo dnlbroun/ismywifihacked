@@ -1,0 +1,47 @@
+# Caddy: TLS + reverse proxy. Installed as /etc/caddy/Caddyfile.
+# Caddy writes no access logs unless a `log` directive is added: keep it that way
+# (access logs would record visitor IPs).
+{
+	admin off
+	# Caddy's error log includes the request; strip anything that identifies the
+	# visitor so we never store their IP in the journal.
+	log default {
+		format filter {
+			wrap json
+			fields {
+				request>remote_ip delete
+				request>remote_port delete
+				request>client_ip delete
+				request>headers delete
+				request>tls delete
+			}
+		}
+	}
+}
+
+(app) {
+	encode zstd gzip
+	header -Server
+	reverse_proxy 127.0.0.1:8000 {
+		# Overwrite (not append): the app trusts the rightmost X-Forwarded-For entry
+		# from 127.0.0.1 only, and this guarantees that entry is the real peer.
+		header_up X-Forwarded-For {remote_host}
+		header_up -Forwarded
+		header_up -X-Real-IP
+	}
+}
+
+ismywifihacked.com {
+	import app
+}
+
+# Single-family hosts used by the page to learn the visitor's other address
+# (v4 has only an A record, v6 only an AAAA record).
+v4.ismywifihacked.com, v6.ismywifihacked.com {
+	import app
+}
+
+www.ismywifihacked.com {
+	header -Server
+	redir https://ismywifihacked.com{uri} permanent
+}

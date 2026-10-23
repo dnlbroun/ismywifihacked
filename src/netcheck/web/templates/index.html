@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block head %}<script src="/static/scan.js" defer></script>{% endblock %}
+{% block main %}
+<section class="hero">
+  <h1>Is my Wi-Fi hacked?</h1>
+  <p class="lede">We can't see inside your Wi-Fi, but in one click we can check the most common signs a home
+     network has been compromised: an infected device, hijacked DNS settings, or a router left open to the internet.
+     We look from the outside, the way an attacker would, and explain what we find in plain English.</p>
+
+  <form id="scan-form" method="post" action="/scan"
+        data-dns-zone="{{ dns_zone }}" data-v4-host="{{ v4_host }}" data-v6-host="{{ v6_host }}">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <input type="hidden" name="dns_token" value="">
+    <input type="hidden" name="claim" value="">
+    <input type="hidden" name="claim" value="">
+    <button type="submit" class="primary">Scan me</button>
+    <p class="consent">By clicking, you confirm this is your connection, or you have permission to test it.
+       If you're on shared Wi-Fi (an office, café or apartment building), the scan covers everyone on that connection.</p>
+    <p id="scan-status" class="status-line" role="status" aria-live="polite"></p>
+  </form>
+</section>
+
+<section class="explain">
+  <h2>What we check</h2>
+  <ul class="checks">
+    <li><strong>Botnet &amp; reputation.</strong> Has your internet address been seen scanning or attacking other computers? (A sign of an infected device.)</li>
+    <li><strong>DNS hijacking.</strong> Are your web lookups going somewhere they shouldn't? Malware sometimes changes router settings to do this.</li>
+    <li><strong>Open doors.</strong> We try about 30 common entry points from the internet, like router admin pages, cameras, file sharing, remote desktop and UPnP, and tell you which ones answer. We also check what security search engines have already seen on your address.</li>
+  </ul>
+  <p>Your results also include a 2-minute checklist for the things no website can see: who's connected to your Wi-Fi and how it's secured.</p>
+  <p>The check takes about 15 seconds. We never try passwords and never break in. We only see whether something answers.</p>
+</section>
+{% endblock %}

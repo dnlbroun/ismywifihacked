@@ -1,0 +1,7 @@
+name: AT&T
+asns: [7018]
+
+# TODO: ISP-specific steps, verified against the provider's current router/app docs.
+# Any finding missing here falls back to generic.yaml. Use the same keys as generic.yaml
+# (see generic.yaml for the full list). Don't guess admin-panel paths.
+steps: {}

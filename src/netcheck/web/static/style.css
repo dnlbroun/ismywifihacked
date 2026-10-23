@@ -1,0 +1,150 @@
+:root {
+  --bg: #f7f7f5;
+  --surface: #ffffff;
+  --text: #1c1c1a;
+  --muted: #5d5d58;
+  --border: #e2e1dc;
+  --accent: #1f5fbf;
+  --accent-text: #ffffff;
+  --good: #1d7a46;
+  --good-bg: #e8f5ed;
+  --warn: #8a5a00;
+  --warn-bg: #fdf3dc;
+  --bad: #b3261e;
+  --bad-bg: #fce9e7;
+  --unknown: #4f5560;
+  --unknown-bg: #eceef1;
+  --radius: 12px;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.55;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #151614;
+    --surface: #1e1f1c;
+    --text: #ecebe6;
+    --muted: #a6a59f;
+    --border: #33342f;
+    --accent: #6ea2f2;
+    --accent-text: #0d1a2e;
+    --good: #6fcf97;
+    --good-bg: #17291f;
+    --warn: #f0c060;
+    --warn-bg: #2d2412;
+    --bad: #f28b82;
+    --bad-bg: #331a18;
+    --unknown: #b4bac4;
+    --unknown-bg: #24262a;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+header.site, main, footer.site {
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+header.site { padding-top: 20px; padding-bottom: 8px; }
+.brand { font-weight: 650; color: var(--text); text-decoration: none; }
+
+h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); line-height: 1.2; margin: 0.4em 0; }
+h2 { font-size: 1.15rem; margin: 0; }
+
+.lede { font-size: 1.1rem; color: var(--muted); }
+.muted { color: var(--muted); }
+
+.hero { padding: 24px 0 8px; }
+
+button.primary, a.button {
+  display: inline-block;
+  font: inherit;
+  font-weight: 600;
+  font-size: 1.1rem;
+  padding: 14px 28px;
+  border-radius: var(--radius);
+  border: 0;
+  background: var(--accent);
+  color: var(--accent-text);
+  cursor: pointer;
+  text-decoration: none;
+}
+button.primary:disabled { opacity: 0.6; cursor: progress; }
+button.primary:focus-visible, a.button:focus-visible { outline: 3px solid var(--text); outline-offset: 2px; }
+
+.consent { font-size: 0.9rem; color: var(--muted); max-width: 36rem; }
+.status-line { font-weight: 600; min-height: 1.5em; }
+
+.explain, .limits { padding: 16px 0; }
+.checks { padding-left: 1.2em; }
+.checks li { margin-bottom: 0.6em; }
+
+.summary {
+  margin: 16px 0;
+  padding: 20px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 6px solid var(--status, var(--border));
+}
+.eyebrow { margin: 0; text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.8rem; color: var(--muted); }
+.meta { display: grid; gap: 4px; margin: 12px 0 0; }
+.meta div { display: flex; gap: 8px; flex-wrap: wrap; }
+.meta dt { color: var(--muted); min-width: 6.5rem; }
+.meta dd { margin: 0; overflow-wrap: anywhere; }
+
+.cards { display: grid; gap: 14px; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 6px solid var(--status);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+}
+.card header { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.card .headline { font-weight: 600; margin: 10px 0 6px; }
+.card .facts { padding-left: 1.2em; margin: 6px 0; }
+.card .facts li { overflow-wrap: anywhere; margin-bottom: 4px; }
+.card .note { color: var(--muted); font-size: 0.95rem; margin: 6px 0; }
+.fix { margin-top: 10px; }
+.fix summary { cursor: pointer; font-weight: 600; }
+.fix ol { padding-left: 1.4em; }
+
+.pill {
+  font-size: 0.85rem;
+  font-weight: 650;
+  padding: 3px 10px;
+  border-radius: 999px;
+  color: var(--status);
+  background: var(--status-bg);
+  white-space: nowrap;
+}
+
+.status-good { --status: var(--good); --status-bg: var(--good-bg); }
+.status-warn { --status: var(--warn); --status-bg: var(--warn-bg); }
+.status-bad { --status: var(--bad); --status-bg: var(--bad-bg); }
+.status-unknown { --status: var(--unknown); --status-bg: var(--unknown-bg); }
+
+footer.site { padding-top: 24px; padding-bottom: 40px; color: var(--muted); font-size: 0.92rem; }
+footer.site h2 { font-size: 1rem; color: var(--text); }
+
+.wifi {
+  margin: 20px 0 8px;
+  padding: 18px 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.checklist { padding-left: 1.4em; }
+.checklist li { margin-bottom: 0.6em; }
+footer.site a { color: var(--accent); }

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Your results · Network Checkup{% endblock %}
+{% block main %}
+<section class="summary status-{{ report.overall }}">
+  <p class="eyebrow">Your results</p>
+  <h1>{{ report.overall_headline }}</h1>
+  <dl class="meta">
+    <div><dt>Connection</dt><dd>{{ report.addresses | join(", ") }}</dd></div>
+    <div><dt>Provider</dt><dd>{{ report.isp_name }}{% if report.network_name %} <span class="muted">({{ report.network_name }})</span>{% endif %}</dd></div>
+  </dl>
+</section>
+
+<section class="cards">
+  {% for card in report.cards %}
+  <article class="card status-{{ card.status }}" id="{{ card.key }}">
+    <header>
+      <h2>{{ card.title }}</h2>
+      <span class="pill">{{ status_labels[card.status] }}</span>
+    </header>
+    <p class="headline">{{ card.headline }}</p>
+    {% if card.facts %}
+    <ul class="facts">
+      {% for fact in card.facts %}<li>{{ fact }}</li>{% endfor %}
+    </ul>
+    {% endif %}
+    {% if card.note %}<p class="note">{{ card.note }}</p>{% endif %}
+    {% if card.steps %}
+    <details class="fix" open>
+      <summary>How to fix</summary>
+      <ol>{% for step in card.steps %}<li>{{ step }}</li>{% endfor %}</ol>
+    </details>
+    {% endif %}
+  </article>
+  {% endfor %}
+</section>
+
+{% include "_wifi_check.html" %}
+
+<section class="limits">
+  <h2>What we can't check</h2>
+  <ul>{% for item in cant_check %}<li>{{ item }}</li>{% endfor %}</ul>
+  <p class="muted">This page is private to anyone with the link and is deleted 24 hours after the scan.</p>
+  <p><a class="button" href="/">Run another check</a></p>
+</section>
+{% endblock %}

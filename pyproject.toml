@@ -1,0 +1,68 @@
+[project]
+name = "netcheck"
+version = "0.1.0"
+description = "One-click security checkup of the visitor's own internet connection"
+authors = [
+    { name = "Daniel Broun" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "cryptography>=50.0.2",
+    "defusedxml>=0.7.1",
+    "dnslib>=0.9.26",
+    "fastapi>=0.162.0",
+    "httpx>=0.28.1",
+    "jinja2>=3.1.6",
+    "pydantic-settings>=2.16.1",
+    "python-multipart>=0.0.32",
+    "pyyaml>=6.0.3",
+    "uvicorn>=0.54.0",
+]
+
+[build-system]
+requires = ["uv_build>=0.11.8,<0.12.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "httpx2>=2.16.0",
+    "mypy>=2.4.0",
+    "pip-audit>=2.10.1",
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+    "respx>=0.23.1",
+    "ruff>=0.17.2",
+    "types-pyyaml>=6.0.12.20260906",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "SIM", "RUF", "ASYNC", "PT"]
+ignore = [
+    "ASYNC109",  # network probes take explicit per-call timeouts on purpose
+    "E501",  # ruff format owns line length; long user-facing strings are fine
+]
+
+[tool.ruff.lint.per-file-ignores]
+# assert is how pytest works; tests bind local listeners and use fixed fake tokens.
+"tests/**" = ["S101", "S104", "S105", "S106"]
+
+[tool.mypy]
+strict = true
+python_version = "3.12"
+mypy_path = "src"
+packages = ["netcheck", "tests"]
+
+[[tool.mypy.overrides]]
+module = ["dnslib.*", "defusedxml.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+addopts = "-ra --strict-markers"

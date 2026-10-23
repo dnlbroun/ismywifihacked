@@ -1,0 +1,16 @@
+[Unit]
+Description=Refresh the iptoasn database and restart the web app
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/netcheck/app/scripts/fetch-asn-db.sh /var/lib/netcheck/asn
+ExecStartPost=/bin/systemctl try-restart netcheck-web.service
+NoNewPrivileges=yes
+ProtectSystem=strict
+ReadWritePaths=/var/lib/netcheck/asn
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX

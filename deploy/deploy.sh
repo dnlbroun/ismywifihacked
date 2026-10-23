@@ -33,7 +33,7 @@ install -m 644 deploy/systemd/*.service deploy/systemd/*.timer /etc/systemd/syst
 install -m 644 deploy/Caddyfile /etc/caddy/Caddyfile
 caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile >/dev/null
 systemctl daemon-reload
-systemctl enable --now netcheck-asn-update.timer
+systemctl enable --now netcheck-asn-update.timer netcheck-health.timer
 systemctl enable netcheck-dns netcheck-web caddy
 systemctl restart netcheck-dns netcheck-web caddy
 sleep 3

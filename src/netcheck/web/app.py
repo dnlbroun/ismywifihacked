@@ -13,7 +13,13 @@ from typing import Any, Protocol
 
 import jinja2
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, Response
+from fastapi.responses import (
+    FileResponse,
+    HTMLResponse,
+    JSONResponse,
+    RedirectResponse,
+    Response,
+)
 from fastapi.staticfiles import StaticFiles
 
 from netcheck.addrpolicy import AddressPolicy, RefusalReason, RefusedAddress, ScanTarget
@@ -204,6 +210,10 @@ def create_app(
     @app.api_route("/how-it-works", methods=["GET", "HEAD"], response_class=HTMLResponse)
     async def how_it_works() -> HTMLResponse:
         return render("how.html")
+
+    @app.get("/favicon.ico", include_in_schema=False)
+    async def favicon() -> Response:
+        return FileResponse(HERE / "static" / "apple-touch-icon.png", media_type="image/png")
 
     @app.post("/api/claim")
     async def claim(request: Request) -> JSONResponse:

@@ -3,6 +3,9 @@ name: CI
 on:
   push:
   pull_request:
+  # Weekly, so pip-audit catches newly published vulnerabilities even without commits.
+  schedule:
+    - cron: "17 9 * * 1"
 
 permissions:
   contents: read

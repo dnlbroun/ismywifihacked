@@ -354,3 +354,6 @@ def test_pages(h: Harness) -> None:
         assert 'id="privacy"' in how
         assert "GreyNoise and Shodan" in how
         assert c.head("/").status_code == 200
+        assert 'property="og:image" content="https://example.com/static/og.png"' in how
+        assert c.get("/favicon.ico").headers["content-type"] == "image/png"
+        assert c.get("/static/og.png").status_code == 200

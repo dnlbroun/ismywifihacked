@@ -1,0 +1,57 @@
+name: Uptime
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check site, DNS server and certificate
+        id: check
+        run: |
+          problems=""
+          code=$(curl -s -o page.html -w '%{http_code}' --max-time 15 https://ismywifihacked.com/ || true)
+          if [ "$code" != 200 ] || ! grep -q "Scan me" page.html; then
+            problems="$problems Site returned HTTP ${code:-none}."
+          fi
+          ns=$(dig +short ns1.ismywifihacked.com A | head -1)
+          answer=$(dig +short +time=5 +tries=2 @"$ns" "$(openssl rand -hex 16).dns.ismywifihacked.com" A)
+          if [ -z "$ns" ] || [ "$answer" != "$ns" ]; then
+            problems="$problems DNS server didn't answer a test lookup."
+          fi
+          status=$(dig +time=5 +tries=2 @"$ns" google.com A | grep -o 'status: [A-Z]*' | cut -d' ' -f2)
+          if [ "$status" != REFUSED ]; then
+            problems="$problems DNS server answered an outside lookup (${status:-no reply}): it must refuse."
+          fi
+          end=$(echo | openssl s_client -connect ismywifihacked.com:443 -servername ismywifihacked.com 2>/dev/null \
+                | openssl x509 -noout -enddate | cut -d= -f2)
+          if [ -z "$end" ] || [ $(( ($(date -d "$end" +%s) - $(date +%s)) / 86400 )) -lt 14 ]; then
+            problems="$problems HTTPS certificate expires soon (${end:-unreadable})."
+          fi
+          echo "problems=$problems" >> "$GITHUB_OUTPUT"
+
+      # Alert only when the state changes, so an outage notifies once, not every 15 minutes.
+      - name: Notify on change
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          PROBLEMS: ${{ steps.check.outputs.problems }}
+        run: |
+          prev=$(gh run list -R "$GITHUB_REPOSITORY" --workflow uptime.yml --status completed --limit 1 \
+                 --json conclusion --jq '.[0].conclusion // "success"')
+          notify() { [ -n "$NTFY_TOPIC" ] && curl -s -H "Title: $1" -d "$2" "https://ntfy.sh/$NTFY_TOPIC" >/dev/null; }
+          if [ -n "$PROBLEMS" ]; then
+            [ "$prev" = success ] && notify "ismywifihacked.com is down" "$PROBLEMS"
+            echo "$PROBLEMS"
+            exit 1
+          elif [ "$prev" = failure ]; then
+            notify "ismywifihacked.com recovered" "Site and DNS server are OK again."
+          fi

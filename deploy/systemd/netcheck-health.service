@@ -1,0 +1,17 @@
+[Unit]
+Description=Network Checkup health check (alerts via ntfy)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/netcheck/netcheck.env
+Environment=DATA_DIR=/var/lib/netcheck
+ExecStart=/opt/netcheck/app/.venv/bin/python -m netcheck.health
+StateDirectory=netcheck/health
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
